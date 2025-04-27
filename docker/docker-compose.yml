@@ -1,18 +1,14 @@
 services:
+
   target:
     build: ./target
     container_name: target
     networks:
-      production-net:
+      internal-net:
         ipv4_address: 172.30.0.3
     cap_add:
       - NET_ADMIN
-    command: >
-      sh -c "ip route del default &&
-             ip route add default via 172.30.0.5 &&
-             service ssh start &&
-             service nginx start &&
-             sleep infinity"
+    command: sh /scripts/init.sh
 
   suricata:
     build: ./suricata
@@ -24,7 +20,7 @@ services:
       - ../suricata/logs:/var/log/suricata
     cap_add:
       - NET_ADMIN
-    command: sh -c "suricata-update && suricata -i eth0 -c /etc/suricata/suricata.yaml -v"
+    command: sh /scripts/init.sh
     
   adversary:
     build: ./adversary
@@ -34,9 +30,7 @@ services:
         ipv4_address: 172.28.0.4
     cap_add:
       - NET_ADMIN
-    command: >
-        sh -c "ip route add 172.30.0.0/24 via 172.28.0.5 dev eth0 &&
-             sleep infinity"
+    command: sh /scripts/init.sh
   
   gateway:
     build: ./gateway
@@ -47,12 +41,24 @@ services:
         ipv4_address: 172.28.0.5
       sensor-net:
         ipv4_address: 172.29.0.5
-      production-net:
+      internal-net:
         ipv4_address: 172.30.0.5
-    command: >
-      sh -c "sysctl -w net.ipv4.ip_forward=1 &&
-            /tmp/tc_init.sh &&
-            sleep infinity"
+    command: sh /scripts/init.sh
+  
+  dns:
+    build: ./dns
+    container_name: dns
+    networks:
+      external-net:
+        ipv4_address: 172.28.0.53
+    ports:
+      - "5353:53/udp"
+      - "5353:53/tcp"
+    volumes:
+      - ./dns/config/dnsmasq.conf:/etc/dnsmasq.d/00-lab.conf
+      - ./dns/config/hosts.txt:/etc/dnsmasq.hosts
+    cap_add:
+      - NET_ADMIN
 
 networks:
   external-net:
@@ -65,7 +71,7 @@ networks:
     ipam:
       config:
         - subnet: 172.29.0.0/24
-  production-net:
+  internal-net:
     driver: bridge
     ipam:
       config:

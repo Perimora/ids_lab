@@ -4,6 +4,7 @@ FROM ubuntu:22.04
 RUN apt-get update && apt-get install -y \
     software-properties-common \
     curl \
+    iproute2 \
     apt-transport-https \
     ca-certificates \
     gnupg2 \
@@ -21,6 +22,10 @@ RUN add-apt-repository ppa:oisf/suricata-stable -y && \
 
 # copy suricata config
 COPY config/suricata.yaml /etc/suricata/suricata.yaml
+
+# copy init script
+COPY scripts/init.sh scripts/init.sh
+RUN chmod +x scripts/init.sh
 
 # copy custom rules into the container
 COPY config/custom.rules /var/lib/suricata/rules/custom.rules
