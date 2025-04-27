@@ -1,60 +1,72 @@
 #!/bin/bash
 
-# Simple system integrity check for IDS experiment
-# Step 1: Verify basic network connectivity (ping tests)
+# improved system integrity check for ids experiment
+# verifies bidirectional pings and traffic visibility via suricata
 
-set -e
+set -euo pipefail
 
-echo "[*] Starting network connectivity checks..."
+tmp_log="/tmp/tcpdump_output.log"
 
-# Array of container names
-containers=("suricata" "target" "adversary")
+echo "[*] starting network connectivity checks..."
 
-# Step 1.1: Ping each container from suricata
-for target in "${containers[@]}"; do
-  if [ "$target" != "suricata" ]; then
-    echo "[*] Pinging $target from suricata..."
-    docker exec suricata ping -c 3 "$target"
-    echo
+# step 1: basic connectivity (ping each container to target)
+echo "[*] checking container connectivity..."
+
+# ping from adversary to target
+echo "[*] pinging target (172.30.0.3) from adversary..."
+docker exec adversary ping -c 3 172.30.0.3
+echo
+
+# ping from target to adversary
+echo "[*] pinging adversary (172.28.0.4) from target..."
+docker exec target ping -c 3 172.28.0.4
+echo
+
+echo "[+] basic network connectivity check complete."
+
+# step 2: suricata traffic visibility check
+echo "[*] checking suricata traffic visibility on eth0..."
+
+check_visibility() {
+  local source_container=$1
+  local destination_ip=$2
+
+  echo "[*] starting tcpdump inside suricata (listening for icmp)..."
+  docker exec suricata timeout 10 tcpdump -i eth0 icmp > "$tmp_log" 2>&1 &
+  local tcpdump_pid=$!
+
+  sleep 2  # give tcpdump a moment to start
+
+  echo "[*] pinging $destination_ip from $source_container..."
+  docker exec "$source_container" ping -c 3 "$destination_ip"
+
+  # wait for tcpdump to finish
+  wait $tcpdump_pid || {
+    exit_code=$?
+    if [ "$exit_code" -ne 124 ]; then
+      echo "[!] unexpected tcpdump termination (exit code $exit_code)"
+      exit 1
+    fi
+  }
+
+  # analyze tcpdump output
+  if grep -q "icmp echo request" "$tmp_log"; then
+    echo "[+] suricata detected icmp traffic from $source_container to $destination_ip."
+  else
+    echo "[!] suricata did not detect icmp traffic from $source_container to $destination_ip!"
+    if [[ "${DEBUG:-0}" == "1" ]]; then
+      echo "[debug] tcpdump output:"
+      cat "$tmp_log"
+    fi
+    rm -f "$tmp_log"
+    exit 1
   fi
-done
 
-# Step 1.2: Ping each container from adversary
-for target in "${containers[@]}"; do
-  if [ "$target" != "adversary" ]; then
-    echo "[*] Pinging $target from adversary..."
-    docker exec adversary ping -c 3 "$target"
-    echo
-  fi
-done
+  rm -f "$tmp_log"
+}
 
-# Step 1.3: Ping each container from target
-for target in "${containers[@]}"; do
-  if [ "$target" != "target" ]; then
-    echo "[*] Pinging $target from target..."
-    docker exec target ping -c 3 "$target"
-    echo
-  fi
-done
+# check both directions
+check_visibility adversary 172.30.0.3
+check_visibility target 172.28.0.4
 
-echo "[+] Network connectivity check complete."
-
-# Step 2: Verify Suricata can see network traffic
-
-echo "[*] Checking if Suricata can see traffic on eth0..."
-
-# Step 2.1: Start tcpdump in background inside suricata container
-echo "[*] Starting tcpdump..."
-docker exec suricata timeout 10 tcpdump -i eth0 icmp &
-TCPDUMP_PID=$!
-
-# Step 2.2: Generate traffic: Ping from adversary to target
-sleep 2  # give tcpdump 2 seconds to start
-echo "[*] Sending ICMP ping from adversary to target..."
-docker exec adversary ping -c 3 target
-
-# Step 2.3: Wait for tcpdump to finish
-wait $TCPDUMP_PID
-
-echo "[+] Traffic visibility check complete."
-
+echo "[+] traffic visibility check complete."

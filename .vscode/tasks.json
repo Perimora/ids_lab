@@ -54,6 +54,25 @@
               "problemMatcher": []
           },
           {
+            "label": "Suricata Experiment: Full Test (Up, Validate, Down)",
+            "type": "shell",
+            "command": "mkdir -p ../suricata/logs && chmod 755 ../suricata/logs && docker compose up -d && sleep 5 && ./scripts/check_system_integrity.sh; EXIT_CODE=$?; docker compose down; exit $EXIT_CODE",
+            "options": {
+              "cwd": "${workspaceFolder}/docker"
+            },
+            "problemMatcher": [],
+            "presentation": {
+              "echo": true,
+              "reveal": "always",
+              "focus": true,
+              "panel": "new"
+            },
+            "group": {
+              "kind": "build",
+              "isDefault": false
+            }
+          },
+          {
               "label": "Suricata Experiment: Bash in Target",
               "type": "shell",
               "command": "docker exec -it target bash",
@@ -145,25 +164,6 @@
                 "focus": false,
                 "panel": "shared"
               }
-            },
-            {
-              "label": "Suricata Experiment: Check System Integrity",
-              "type": "shell",
-              "command": "./scripts/check_system_integrity.sh",
-              "options": {
-                  "cwd": "${workspaceFolder}/docker"
-              },
-              "problemMatcher": [],
-              "presentation": {
-                  "echo": true,
-                  "reveal": "always",
-                  "focus": true,
-                  "panel": "new"
-              },
-              "group": {
-                  "kind": "test",
-                  "isDefault": false
-              }
-          }                                        
+            },                                   
       ]
   }
