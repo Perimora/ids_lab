@@ -2,7 +2,7 @@
       "version": "2.0.0",
       "tasks": [
           {
-              "label": "Suricata Experiment: Up",
+              "label": "Lab: Start Containers",
               "type": "shell",
               "command": "mkdir -p ../suricata/logs && chmod 755 ../suricata/logs && docker compose up -d",
               "options": {
@@ -15,7 +15,7 @@
               "problemMatcher": []
           },
           {
-              "label": "Suricata Experiment: Down",
+              "label": "Lab: Stop Containers",
               "type": "shell",
               "command": "docker compose down",
               "options": {
@@ -28,7 +28,7 @@
               "problemMatcher": []
           },
           {
-            "label": "Suricata Experiment: Build",
+            "label": "Lab: Build Images",
             "type": "shell",
             "command": "docker compose build",
             "options": {
@@ -41,7 +41,7 @@
             "problemMatcher": []
         },
           {
-              "label": "Suricata Experiment: Build Prestine",
+              "label": "Lab: Build Images (No Cache)",
               "type": "shell",
               "command": "docker compose build --no-cache",
               "options": {
@@ -54,7 +54,7 @@
               "problemMatcher": []
           },
           {
-            "label": "Suricata Experiment: Full Test (Up, Validate, Down)",
+            "label": "Lab: Network Validation",
             "type": "shell",
             "command": "mkdir -p ../suricata/logs && chmod 755 ../suricata/logs && docker compose up -d && sleep 5 && ./scripts/check_system_integrity.sh; EXIT_CODE=$?; docker compose down; exit $EXIT_CODE",
             "options": {
@@ -73,7 +73,7 @@
             }
           },
           {
-              "label": "Suricata Experiment: Bash in Target",
+              "label": "Lab: Bash into Target",
               "type": "shell",
               "command": "docker exec -it target bash",
               "problemMatcher": [],
@@ -85,7 +85,7 @@
               }
             },
             {
-              "label": "Suricata Experiment: Bash in Suricata",
+              "label": "Lab: Bash into Suricata",
               "type": "shell",
               "command": "docker exec -it suricata bash",
               "problemMatcher": [],
@@ -97,7 +97,7 @@
               }
             },
             {
-              "label": "Suricata Experiment: Bash in Adversary",
+              "label": "Lab: Bash into Adversary",
               "type": "shell",
               "command": "docker exec -it adversary bash",
               "problemMatcher": [],
@@ -109,9 +109,9 @@
               }
             },
             {
-              "label": "Suricata Experiment: Bash in Proxy",
+              "label": "Lab: Bash into Gateway",
               "type": "shell",
-              "command": "docker exec -it proxy bash",
+              "command": "docker exec -it gateway bash",
               "problemMatcher": [],
               "presentation": {
                 "echo": true,
@@ -121,7 +121,19 @@
               }
             },
             {
-              "label": "Suricata Experiment: Clear Logs",
+              "label": "Lab: Bash into DNS",
+              "type": "shell",
+              "command": "docker exec -it dns bash",
+              "problemMatcher": [],
+              "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new"
+              }
+            },
+            {
+              "label": "Lab: Clear Suricata Logs",
               "type": "shell",
               "command": "rm -f suricata/logs/*.log && rm -f suricata/logs/*.json",
               "options": {
@@ -136,7 +148,7 @@
               }
             },
             {
-              "label": "Suricata Experiment: Run Scan from Adversary",
+              "label": "Lab: Launch Adversary Scan",
               "type": "shell",
               "command": "docker exec adversary /scripts/scan.sh 172.30.0.3",
               "options": {
@@ -151,7 +163,7 @@
               }
             },
             {
-              "label": "Suricata Experiment: Clean Up (Project Only)",
+              "label": "Lab: Full Clean (Images, Volumes)",
               "type": "shell",
               "command": "docker compose down --rmi all --volumes --remove-orphans",
               "options": {
@@ -164,6 +176,24 @@
                 "focus": false,
                 "panel": "shared"
               }
-            },                                   
+            },
+            {
+              "label": "Lab: Reload DNS Service",
+              "type": "shell",
+              "command": "docker exec dns kill -HUP $(pidof dnsmasq)",
+              "problemMatcher": [],
+              "group": {
+                "kind": "build",
+                "isDefault": false
+              },
+              "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+              }
+            }                                   
       ]
   }

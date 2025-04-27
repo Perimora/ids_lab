@@ -7,4 +7,6 @@ RUN apt-get update && \
 
 COPY scripts/scan.sh /scripts/scan.sh
 
+COPY scripts/init.sh scripts/init.sh
+
 RUN chmod +x /scripts/scan.sh
