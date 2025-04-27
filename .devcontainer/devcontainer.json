@@ -1,0 +1,21 @@
+{
+  "name": "aic_complete-devcontainer",
+  "dockerComposeFile": "docker/docker-compose.yml",
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "python.defaultInterpreterPath": "/workspace/.devcontainer/.venv/bin/python"
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  },
+  "remoteUser": "root",
+  "postCreateCommand": "python3 -m venv .devcontainer/.venv && .devcontainer/.venv/bin/pip install --upgrade pip && .devcontainer/.venv/bin/pip install -r .devcontainer/docker/requirements.txt"
+    
+}

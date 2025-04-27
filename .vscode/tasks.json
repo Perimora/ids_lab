@@ -1,0 +1,169 @@
+  {
+      "version": "2.0.0",
+      "tasks": [
+          {
+              "label": "Suricata Experiment: Up",
+              "type": "shell",
+              "command": "mkdir -p ../suricata/logs && chmod 755 ../suricata/logs && docker compose up -d",
+              "options": {
+                  "cwd": "${workspaceFolder}/docker"
+              },
+              "group": {
+                  "kind": "build",
+                  "isDefault": true
+              },
+              "problemMatcher": []
+          },
+          {
+              "label": "Suricata Experiment: Down",
+              "type": "shell",
+              "command": "docker compose down",
+              "options": {
+                  "cwd": "${workspaceFolder}/docker"
+              },
+              "group": {
+                  "kind": "build",
+                  "isDefault": false
+              },
+              "problemMatcher": []
+          },
+          {
+            "label": "Suricata Experiment: Build",
+            "type": "shell",
+            "command": "docker compose build",
+            "options": {
+                "cwd": "${workspaceFolder}/docker"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": []
+        },
+          {
+              "label": "Suricata Experiment: Build Prestine",
+              "type": "shell",
+              "command": "docker compose build --no-cache",
+              "options": {
+                  "cwd": "${workspaceFolder}/docker"
+              },
+              "group": {
+                  "kind": "build",
+                  "isDefault": false
+              },
+              "problemMatcher": []
+          },
+          {
+              "label": "Suricata Experiment: Bash in Target",
+              "type": "shell",
+              "command": "docker exec -it target bash",
+              "problemMatcher": [],
+              "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new"
+              }
+            },
+            {
+              "label": "Suricata Experiment: Bash in Suricata",
+              "type": "shell",
+              "command": "docker exec -it suricata bash",
+              "problemMatcher": [],
+              "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new"
+              }
+            },
+            {
+              "label": "Suricata Experiment: Bash in Adversary",
+              "type": "shell",
+              "command": "docker exec -it adversary bash",
+              "problemMatcher": [],
+              "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new"
+              }
+            },
+            {
+              "label": "Suricata Experiment: Bash in Proxy",
+              "type": "shell",
+              "command": "docker exec -it proxy bash",
+              "problemMatcher": [],
+              "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new"
+              }
+            },
+            {
+              "label": "Suricata Experiment: Clear Logs",
+              "type": "shell",
+              "command": "rm -f suricata/logs/*.log && rm -f suricata/logs/*.json",
+              "options": {
+                "cwd": "${workspaceFolder}"
+              },
+              "problemMatcher": [],
+              "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+              }
+            },
+            {
+              "label": "Suricata Experiment: Run Scan from Adversary",
+              "type": "shell",
+              "command": "docker exec adversary /scripts/scan.sh 172.30.0.3",
+              "options": {
+                "cwd": "${workspaceFolder}/docker"
+              },
+              "problemMatcher": [],
+              "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+              }
+            },
+            {
+              "label": "Suricata Experiment: Clean Up (Project Only)",
+              "type": "shell",
+              "command": "docker compose down --rmi all --volumes --remove-orphans",
+              "options": {
+                "cwd": "${workspaceFolder}/docker"
+              },
+              "problemMatcher": [],
+              "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+              }
+            },
+            {
+              "label": "Suricata Experiment: Check System Integrity",
+              "type": "shell",
+              "command": "./scripts/check_system_integrity.sh",
+              "options": {
+                  "cwd": "${workspaceFolder}/docker"
+              },
+              "problemMatcher": [],
+              "presentation": {
+                  "echo": true,
+                  "reveal": "always",
+                  "focus": true,
+                  "panel": "new"
+              },
+              "group": {
+                  "kind": "test",
+                  "isDefault": false
+              }
+          }                                        
+      ]
+  }
