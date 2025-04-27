@@ -18,8 +18,8 @@ tc qdisc add dev eth0 ingress
 tc qdisc add dev eth1 ingress
 
 # setup mirroring filter
-tc filter add dev eth0 parent ffff: protocol ip u32 match u32 0 0 action mirred egress mirror dev eth2
-tc filter add dev eth1 parent ffff: protocol ip u32 match u32 0 0 action mirred egress mirror dev eth2
+tc filter add dev eth0 parent ffff: protocol ip u32 match u32 0 0 action mirred egress mirror dev eth1
+tc filter add dev eth2 parent ffff: protocol ip u32 match u32 0 0 action mirred egress mirror dev eth1
 
 echo "[*] tc-mirrored TAP setup complete."
 

@@ -1,0 +1,24 @@
+global:
+  scrape_interval: 15s  # how often prometheus scrapes targets
+  evaluation_interval: 15s  # how often prometheus evaluates rules
+
+scrape_configs:
+  # monitor prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # monitor loki
+  - job_name: 'loki'
+    static_configs:
+      - targets: ['loki:3100']
+
+  # monitor promtail
+  - job_name: 'promtail'
+    static_configs:
+      - targets: ['promtail:9080']
+
+  # monitor suricata via gateway (later after routing setup)
+  - job_name: 'suricata'
+    static_configs:
+      - targets: ['gateway:9108']  # gateway must forward to suricata exporter
