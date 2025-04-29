@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: attacker
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: attacker
+  template:
+    metadata:
+      labels:
+        app: attacker
+    spec:
+      containers:
+        - name: attacker
+          image: {{ .Values.attacker.image }}
+          command: ["sh", "-c", "{{ .Values.attacker.command }}"]
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+          resources:
+            limits:
+              memory: {{ .Values.attacker.resources.limits.memory }}
+              cpu: {{ .Values.attacker.resources.limits.cpu }}
+            requests:
+              memory: {{ .Values.attacker.resources.requests.memory }}
+              cpu: {{ .Values.attacker.resources.requests.cpu }}

@@ -1,0 +1,12 @@
+namespace: external
+
+attacker:
+  image: alpine:latest
+  command: sleep 3600
+  resources:
+    limits:
+      memory: "128Mi"
+      cpu: "250m"
+    requests:
+      memory: "64Mi"
+      cpu: "100m"
