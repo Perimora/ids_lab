@@ -163,6 +163,21 @@
       }
     },
     {
+      "label": "Adversary: Run Ping (→ Target)",
+      "type": "shell",
+      "command": "docker exec adversary timeout 20 ping target.lab",
+      "options": {
+        "cwd": "${workspaceFolder}/docker"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
       "label": "System: Full Cleanup (Images + Volumes)",
       "type": "shell",
       "command": "docker compose down --rmi all --volumes --remove-orphans",
