@@ -1,199 +1,199 @@
-  {
-      "version": "2.0.0",
-      "tasks": [
-          {
-              "label": "Lab: Start Containers",
-              "type": "shell",
-              "command": "mkdir -p ../suricata/logs && chmod 755 ../suricata/logs && docker compose up -d",
-              "options": {
-                  "cwd": "${workspaceFolder}/docker"
-              },
-              "group": {
-                  "kind": "build",
-                  "isDefault": true
-              },
-              "problemMatcher": []
-          },
-          {
-              "label": "Lab: Stop Containers",
-              "type": "shell",
-              "command": "docker compose down",
-              "options": {
-                  "cwd": "${workspaceFolder}/docker"
-              },
-              "group": {
-                  "kind": "build",
-                  "isDefault": false
-              },
-              "problemMatcher": []
-          },
-          {
-            "label": "Lab: Build Images",
-            "type": "shell",
-            "command": "docker compose build",
-            "options": {
-                "cwd": "${workspaceFolder}/docker"
-            },
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "problemMatcher": []
-        },
-          {
-              "label": "Lab: Build Images (No Cache)",
-              "type": "shell",
-              "command": "docker compose build --no-cache",
-              "options": {
-                  "cwd": "${workspaceFolder}/docker"
-              },
-              "group": {
-                  "kind": "build",
-                  "isDefault": false
-              },
-              "problemMatcher": []
-          },
-          {
-            "label": "Lab: Network Validation",
-            "type": "shell",
-            "command": "mkdir -p ../suricata/logs && chmod 755 ../suricata/logs && docker compose up -d && sleep 5 && ./scripts/check_system_integrity.sh; EXIT_CODE=$?; docker compose down; exit $EXIT_CODE",
-            "options": {
-              "cwd": "${workspaceFolder}/docker"
-            },
-            "problemMatcher": [],
-            "presentation": {
-              "echo": true,
-              "reveal": "always",
-              "focus": true,
-              "panel": "new"
-            },
-            "group": {
-              "kind": "build",
-              "isDefault": false
-            }
-          },
-          {
-              "label": "Lab: Bash into Target",
-              "type": "shell",
-              "command": "docker exec -it target bash",
-              "problemMatcher": [],
-              "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "new"
-              }
-            },
-            {
-              "label": "Lab: Bash into Suricata",
-              "type": "shell",
-              "command": "docker exec -it suricata bash",
-              "problemMatcher": [],
-              "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "new"
-              }
-            },
-            {
-              "label": "Lab: Bash into Adversary",
-              "type": "shell",
-              "command": "docker exec -it adversary bash",
-              "problemMatcher": [],
-              "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "new"
-              }
-            },
-            {
-              "label": "Lab: Bash into Gateway",
-              "type": "shell",
-              "command": "docker exec -it gateway bash",
-              "problemMatcher": [],
-              "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "new"
-              }
-            },
-            {
-              "label": "Lab: Bash into DNS",
-              "type": "shell",
-              "command": "docker exec -it dns bash",
-              "problemMatcher": [],
-              "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "new"
-              }
-            },
-            {
-              "label": "Lab: Clear Suricata Logs",
-              "type": "shell",
-              "command": "rm -f suricata/logs/*.log && rm -f suricata/logs/*.json",
-              "options": {
-                "cwd": "${workspaceFolder}"
-              },
-              "problemMatcher": [],
-              "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared"
-              }
-            },
-            {
-              "label": "Lab: Launch Adversary Scan",
-              "type": "shell",
-              "command": "docker exec adversary /scripts/scan.sh 172.30.0.3",
-              "options": {
-                "cwd": "${workspaceFolder}/docker"
-              },
-              "problemMatcher": [],
-              "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared"
-              }
-            },
-            {
-              "label": "Lab: Full Clean (Images, Volumes)",
-              "type": "shell",
-              "command": "docker compose down --rmi all --volumes --remove-orphans",
-              "options": {
-                "cwd": "${workspaceFolder}/docker"
-              },
-              "problemMatcher": [],
-              "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared"
-              }
-            },
-            {
-              "label": "Lab: Reload DNS Service",
-              "type": "shell",
-              "command": "docker exec dns kill -HUP $(pidof dnsmasq)",
-              "problemMatcher": [],
-              "group": {
-                "kind": "build",
-                "isDefault": false
-              },
-              "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": false
-              }
-            }                                   
-      ]
-  }
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "System: Start All Services",
+      "type": "shell",
+      "command": "mkdir -p ../suricata/logs && chmod 755 ../suricata/logs && docker compose up -d",
+      "options": {
+        "cwd": "${workspaceFolder}/docker"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "System: Stop All Services",
+      "type": "shell",
+      "command": "docker compose down",
+      "options": {
+        "cwd": "${workspaceFolder}/docker"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "System: Build All Images",
+      "type": "shell",
+      "command": "docker compose build",
+      "options": {
+        "cwd": "${workspaceFolder}/docker"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "System: Rebuild All Images (No Cache)",
+      "type": "shell",
+      "command": "docker compose build --no-cache",
+      "options": {
+        "cwd": "${workspaceFolder}/docker"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "System: Validate Network Setup",
+      "type": "shell",
+      "command": "mkdir -p ../suricata/logs && chmod 755 ../suricata/logs && docker compose up -d && sleep 5 && ./scripts/check_system_integrity.sh; EXIT_CODE=$?; docker compose down; exit $EXIT_CODE",
+      "options": {
+        "cwd": "${workspaceFolder}/docker"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "Service: Terminal Access - Target",
+      "type": "shell",
+      "command": "docker exec -it target bash",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Service: Terminal Access - Suricata",
+      "type": "shell",
+      "command": "docker exec -it suricata bash",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Service: Terminal Access - Adversary",
+      "type": "shell",
+      "command": "docker exec -it adversary bash",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Service: Terminal Access - Gateway",
+      "type": "shell",
+      "command": "docker exec -it gateway bash",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Service: Terminal Access - DNS",
+      "type": "shell",
+      "command": "docker exec -it dns bash",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Suricata: Clear Log Files",
+      "type": "shell",
+      "command": "rm -f suricata/logs/*.log && rm -f suricata/logs/*.json",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Adversary: Run Port Scan (→ Target)",
+      "type": "shell",
+      "command": "docker exec adversary /scripts/scan.sh 172.30.0.3",
+      "options": {
+        "cwd": "${workspaceFolder}/docker"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "System: Full Cleanup (Images + Volumes)",
+      "type": "shell",
+      "command": "docker compose down --rmi all --volumes --remove-orphans",
+      "options": {
+        "cwd": "${workspaceFolder}/docker"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "DNS: Reload DNSMasq Configuration",
+      "type": "shell",
+      "command": "docker exec dns kill -HUP $(pidof dnsmasq)",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      }
+    }
+  ]
+}
