@@ -1,108 +1,120 @@
-# Lab: Inline Gateway with Suricata IDS
+# Suricata-Based Network Security Lab
 
-This lab simulates a network security environment with an inline Layer-3 Gateway that mirrors all traffic to a Suricata IDS.
+This lab simulates a realistic network security environment using Suricata IDS and multiple Docker-based components. It enables hands-on testing of attack detection, traffic routing, and network visibility using modern container workflows.
 
-## 🔹 Project Structure
+---
+
+## 📁 Project Structure
 
 ```bash
 .
 ├── README.md
 ├── docker
-│   ├── adversary         # Simulated attacker (nmap, curl, etc.)
+│   ├── adversary          # Simulated attacker (nmap, curl, etc.)
 │   ├── docker-compose.yml # Container orchestration
-│   ├── gateway            # Gateway container (routing and traffic mirroring)
-│   ├── scripts            # Setup scripts (e.g., tc-mirror setup)
-│   ├── suricata           # Suricata IDS container
-│   └── target             # Simulated production target (SSH, Nginx)
-├── docs                # Documentation and diagrams
+│   ├── gateway            # Layer-3 router and traffic mirror
+│   ├── scripts            # Setup scripts (e.g. tc-mirror)
+│   ├── suricata           # IDS container (Suricata)
+│   ├── target             # Simulated production target (SSH, Nginx)
+│   └── test               # Additional test scripts
+├── docs                   # Documentation and diagrams
 ```
 
-## 🔹 Core Concept
+---
 
-**Goal:**
-- Simulate adversary attacks (nmap, ICMP, HTTP probes)
-- Traffic is routed through an inline **Gateway**
-- Gateway mirrors all traffic to **Suricata IDS** via **tc-mirred** (Layer-2 mirroring)
+## 🎯 Objective
 
-**Traffic Flow:**
+**Main goals:**
+
+- Simulate network attacks (e.g., ICMP, HTTP probes, port scans)
+- Route traffic through an inline **gateway**
+- Mirror traffic to **Suricata IDS** using **tc-mirred**
+
+**Traffic flow:**
 
 ```
 Adversary (external-net)
     ⇨ Gateway (external-net)
-        ⇨ Gateway (production-net)
-            ⇨ Target (production-net)
+        ⇨ Gateway (internal-net)
+            ⇨ Target (internal-net)
+
 Response:
-Target ⇨ Gateway (production-net) ⇨ Gateway (external-net) ⇨ Adversary
+Target ⇨ Gateway ⇨ Adversary
+
 Meanwhile:
-Traffic ⇨ mirrored from Gateway eth0/eth1 ⇨ eth2 (sensor-net) ⇨ Suricata
+Traffic mirrored via tc-mirred (eth0 & eth1 → eth2) ⇨ Suricata (sensor-net)
 ```
 
-## 🔹 Key Components
+---
 
-| Component | Purpose |
-|:----------|:--------|
-| **adversary** | Attack simulation (nmap, curl, custom scans) |
-| **gateway** | Layer-3 router & inline TAP (tc-mirred traffic mirroring) |
-| **target** | Production server (SSH and Nginx) |
-| **suricata** | IDS to monitor mirrored traffic |
+## 🧩 Components & Networks
 
-## 🔹 Important Details
+| Container  | Purpose                                          | Networks (with IPs)                           |
+|------------|--------------------------------------------------|-----------------------------------------------|
+| `adversary`| Simulates attacks (nmap, curl, etc.)             | `external-net` – `172.28.0.4`                 |
+| `gateway`  | Inline Layer-3 router + traffic mirroring        | `external-net` – `172.28.0.5`<br>`sensor-net` – `172.29.0.5`<br>`internal-net` – `172.30.0.5` |
+| `target`   | Simulated production host (SSH, Nginx)           | `internal-net` – `172.30.0.3`                 |
+| `suricata` | Intrusion Detection System (passive analysis)    | `sensor-net` – `172.29.0.2`                   |
+| `dns`      | Local DNS server (dnsmasq)                       | `external-net` – `172.28.0.53`                |
 
-- **IP forwarding** is enabled on the Gateway.
-- **tc-mirred** is used for real Layer-2 traffic mirroring:
-  - eth0 (external-net) ⇨ mirrored to eth2
-  - eth1 (production-net) ⇨ mirrored to eth2
-- **Suricata** listens on eth0 inside sensor-net.
-- **Privileged Mode** is enabled where needed (for tc and net admin).
-- **No NAT**, pure IP routing (transparent Gateway).
+**Defined Docker networks:**
 
-## 🔹 Quick Start
+- `external-net` → 172.28.0.0/24  
+- `sensor-net`   → 172.29.0.0/24  
+- `internal-net` → 172.30.0.0/24
 
-1. Move into docker folder:
+---
 
-```bash
-cd docker
-```
+## 🚀 Getting Started (via VS Code Tasks)
 
-2. Start all containers:
+All workflows are integrated as **VS Code Tasks**. Open the **Command Palette** (`F1` or `Ctrl+Shift+P`) and run the desired task by name.
 
-```bash
-docker compose up -d
-```
+### 1. Start the lab
 
-3. Verify services:
+- Run: **`System: Start All Services`**  
+  *Launches all containers and prepares logging directories.*
 
-```bash
-docker ps
-```
+---
 
-4. Test traffic:
-- From adversary: `ping 172.30.0.3`
-- Launch nmap scans: `nmap -p 22,80,443 172.30.0.3`
+### 2. Validate the network
 
-5. Monitor mirrored traffic:
-- On gateway:
-  ```bash
-  docker exec -it gateway bash
-  tcpdump -i eth2 -n
-  ```
-- On Suricata:
-  ```bash
-  docker exec -it suricata bash
-  tail -f /var/log/suricata/fast.log
-  ```
+- Run: **`System: Validate Network Setup`**  
+  *Automatically verifies correct connectivity and shuts down the containers afterward.*
 
-## 🔹 Notes
+---
 
-- Ensure tc-mirrored setup runs inside gateway container (`/tmp/tc.sh`).
-- The gateway must stay privileged to control traffic redirection.
-- Target container has default route set to Gateway.
-- Adversary routes via Gateway to reach production targets.
+### 3. Access container terminals
 
-## 🔹 Next Steps
+- **`Service: Terminal Access - Adversary`**  
+- **`Service: Terminal Access - Gateway`**  
+- **`Service: Terminal Access - Target`**  
+- **`Service: Terminal Access - Suricata`**  
+- **`Service: Terminal Access - DNS`**
 
-- Expand attack simulations
-- Tune Suricata rulesets
-- Introduce threat hunting scenarios
-- Visualize traffic flows with live dashboards
+---
 
+### 4. Launch attack simulation
+
+- Run: **`Adversary: Run Port Scan (→ Target)`**  
+  > Launches a simulated scan from the `adversary` to `target` (172.30.0.3).
+
+---
+
+### 5. Clear Suricata logs
+
+- Run: **`Suricata: Clear Log Files`**  
+  *Deletes all `.log` and `.json` files from Suricata logs.*
+
+---
+
+### 6. Stop or clean up the environment
+
+- Stop containers: **`System: Stop All Services`**  
+- Full cleanup: **`System: Full Cleanup (Images + Volumes)`**
+
+---
+
+### 7. Reload DNS configuration
+
+- Run: **`DNS: Reload DNSMasq Configuration`**  
+  *Sends `SIGHUP` to reload `dnsmasq` inside the DNS container*
