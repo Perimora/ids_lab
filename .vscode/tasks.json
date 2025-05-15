@@ -56,7 +56,7 @@
     {
       "label": "System: Validate Network Setup",
       "type": "shell",
-      "command": "mkdir -p ../suricata/logs && chmod 755 ../suricata/logs && docker compose up -d && sleep 5 && ./scripts/check_system_integrity.sh; EXIT_CODE=$?; docker compose down; exit $EXIT_CODE",
+      "command": "mkdir -p ../suricata/logs && chmod 755 ../suricata/logs && docker compose up -d && sleep 5 && ./test/check_system_integrity.sh; EXIT_CODE=$?; docker compose down; exit $EXIT_CODE",
       "options": {
         "cwd": "${workspaceFolder}/docker"
       },
